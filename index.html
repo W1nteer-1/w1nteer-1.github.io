@@ -15,6 +15,8 @@
   [ШРИФТ]       шрифты
   [ИМЯ]         имя на главной
   [ЯЗЫК]        автоопределение + переключатель ru/en
+  [НАВЫКИ]      теги-пилюли под био
+  [HIRE]        строчка "пиши сюда" + копирование ника
   [ПОСХАЛКА]    кликни по имени 7 раз
   [DISCORD]     карточка Discord (Lanyard API)
   [РАБОТЫ]      проекты
@@ -172,6 +174,75 @@
     font-weight: 300;
   }
   .bio p + p { margin-top: 12px; }
+
+  /* [НАВЫКИ] Теги-пилюли под био */
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 24px;
+  }
+  .skills span {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--dim);
+    background: rgba(255, 255, 255, .04);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: color var(--base) var(--ease), background var(--base) var(--ease);
+  }
+  .skills span:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, .07);
+  }
+
+  /* [HIRE] Строчка «пиши сюда» */
+  .hire {
+    margin-top: 18px;
+    font-size: 12.5px;
+    color: var(--dim);
+    font-weight: 300;
+    opacity: .75;
+  }
+  .hire-link {
+    color: var(--dim);
+    border-bottom: 1px dashed rgba(255, 255, 255, .25);
+    padding-bottom: 1px;
+    cursor: pointer;
+    transition: color var(--base) var(--ease), border-color var(--base) var(--ease);
+  }
+  .hire-link:hover {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, .6);
+  }
+
+  /* Всплывающий тост «ник скопирован» */
+  .copy-toast {
+    position: fixed;
+    left: 50%;
+    bottom: max(80px, calc(env(safe-area-inset-bottom) + 70px));
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1a1c;
+    color: var(--text);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: "JetBrains Mono", monospace;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s var(--ease), transform .25s var(--ease);
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .copy-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 
   /* [DISCORD] */
   .discord-card {
@@ -560,6 +631,16 @@
       <p data-i18n="bio.p4">Социофоб. Чаще всего молчу в дискорде, могу иногда что-то сказать. Не люблю шум и всё вот это. Тёмные темы и тишина — комфортная зона.</p>
       <p data-i18n="bio.p5">Люблю внимание, когда называют ласково, а не «эй блядь», и когда пишут первым.</p>
 
+      <div class="skills">
+        <span data-i18n="skill.dev">Roblox Developer</span>
+        <span data-i18n="skill.building">Building</span>
+      </div>
+
+      <p class="hire">
+        <span data-i18n="hire.before">если хочешь нанять меня разработчиком — пиши</span>
+        <a href="#" class="hire-link" data-copy="w1nteer1" data-i18n="hire.link">сюда</a>
+      </p>
+
       <div class="discord-card" id="discordCard">
         <div class="discord-avatar-wrap">
           <img class="discord-avatar" id="discordAvatar" src="" alt="">
@@ -690,7 +771,7 @@
         </div>
       </a>
 
-      <a class="contact-card" href="https://discord.com/users/861467289458704405" target="_blank" rel="noopener">
+      <a class="contact-card" href="#" data-copy="w1nteer1">
         <img class="contact-icon" src="https://cdn.simpleicons.org/discord/e8e8ea" alt="">
         <div class="contact-info">
           <span class="name">Discord</span>
@@ -704,6 +785,8 @@
 </main>
 
 <div class="footer">© 2026 W1nteer</div>
+
+<div class="copy-toast" id="copyToast"></div>
 
 
 <nav class="dock" aria-label="Navigation">
@@ -733,6 +816,11 @@
       'secret': "да, <span class='flag'>я гей</span>, и что? 🏳️‍🌈",
       'h2.work': 'работы', 'h2.fav': 'любимое', 'h2.contact': 'контакты',
       'fav.music': 'музыка', 'fav.games': 'игры',
+      'skill.dev': 'Roblox Developer',
+      'skill.building': 'Building',
+      'hire.before': 'если хочешь нанять меня разработчиком — пиши',
+      'hire.link': 'сюда',
+      'copy.toast': 'ник скопирован:',
       'discord.loading': 'загружаю статус...',
       'discord.online': 'в сети',
       'discord.idle': 'неактивен',
@@ -742,6 +830,7 @@
       'discord.listening': 'слушает',
       'discord.notJoined': 'зайди на сервер Lanyard, чтобы статус работал →',
       'discord.error': 'не удалось получить статус',
+      'discord.copied': 'скопировано!',
     },
     en: {
       'nav.home': 'home', 'nav.work': 'work', 'nav.fav': 'favorites', 'nav.contact': 'contacts',
@@ -753,6 +842,11 @@
       'secret': "yes, <span class='flag'>I'm gay</span>, so what? 🏳️‍🌈",
       'h2.work': 'work', 'h2.fav': 'favorites', 'h2.contact': 'contacts',
       'fav.music': 'music', 'fav.games': 'games',
+      'skill.dev': 'Roblox Developer',
+      'skill.building': 'Building',
+      'hire.before': 'if you want to hire me as a developer — message',
+      'hire.link': 'here',
+      'copy.toast': 'username copied:',
       'discord.loading': 'loading status...',
       'discord.online': 'online',
       'discord.idle': 'idle',
@@ -762,18 +856,10 @@
       'discord.listening': 'listening to',
       'discord.notJoined': 'join the Lanyard server for your status to work →',
       'discord.error': 'could not load status',
+      'discord.copied': 'copied!',
     }
   };
 
-  // ===========================================================
-  // [ЯЗЫК] Автоопределение
-  //
-  // 1. Если пользователь уже выбирал язык вручную (кликал ru/en) —
-  //    всегда используем его выбор.
-  // 2. Иначе смотрим на язык браузера:
-  //    русский и близкие (uk, be, kk, ky, uz, tg, hy, az, ka) → ru,
-  //    все остальные → en.
-  // ===========================================================
   function detectLang() {
     const saved = safeGet('w1nteer-lang');
     if (saved === 'ru' || saved === 'en') return saved;
@@ -1130,6 +1216,52 @@
 
     if (DISCORD_ID) checkUser();
   } catch(e) { console.error('discord:', e); }
+
+
+  // ===========================================================
+  // [COPY] Копирование ника — для карточки Discord и ссылки «пиши сюда»
+  // ===========================================================
+  try {
+    const toast = document.getElementById('copyToast');
+    let toastTimer = null;
+
+    function showToast(text) {
+      if (!toast) return;
+      toast.textContent = text;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    document.querySelectorAll('[data-copy]').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        const nick = el.dataset.copy;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(nick).catch(() => {});
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = nick;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (err) {}
+          document.body.removeChild(ta);
+        }
+
+        const handleEl = el.querySelector('.handle');
+        if (handleEl) {
+          const original = handleEl.textContent;
+          handleEl.textContent = i18n[currentLang]['discord.copied'];
+          setTimeout(() => { handleEl.textContent = original; }, 1500);
+        }
+
+        showToast(`${i18n[currentLang]['copy.toast']} ${nick}`);
+      });
+    });
+  } catch(e) { console.error('copy:', e); }
 
 
   // [ЗАЩИТА]
