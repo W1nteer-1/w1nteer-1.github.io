@@ -14,7 +14,7 @@
   [ЦВЕТА]       цвета сайта
   [ШРИФТ]       шрифты
   [ИМЯ]         имя на главной
-  [ЯЗЫК]        переключатель ru/en
+  [ЯЗЫК]        автоопределение + переключатель ru/en
   [ПОСХАЛКА]    кликни по имени 7 раз
   [DISCORD]     карточка Discord (Lanyard API)
   [РАБОТЫ]      проекты
@@ -166,12 +166,12 @@
   .bio .secret .flag { color: var(--text); font-weight: 600; }
 
   .bio p {
-    margin-top: 28px;
+    margin-top: 20px;
     color: var(--dim);
-    max-width: 46ch;
+    max-width: 52ch;
     font-weight: 300;
   }
-  .bio p + p { margin-top: 14px; }
+  .bio p + p { margin-top: 12px; }
 
   /* [DISCORD] */
   .discord-card {
@@ -554,8 +554,11 @@
       <h1 id="name"><span class="cursor" aria-hidden="true"></span></h1>
       <span class="secret" id="secret">да, <span class="flag">я гей</span>, и что? 🏳️‍🌈</span>
 
-      <p data-i18n="bio.p1">17. делаю игры в роблоксе, в основном всякие мелочи для себя.</p>
-      <p data-i18n="bio.p2">когда не в роблоксе — читаю или залипаю в дискорде.</p>
+      <p data-i18n="bio.p1">15y.o, делаю игры в роблоксе. Фембоииии и минимализм.</p>
+      <p data-i18n="bio.p2">Билдинг беру за основу. ОЧЕНЬ редко лезу в скрипты, но пока так, очень слабенько.</p>
+      <p data-i18n="bio.p3">Пытаюсь разобраться в Блендере. Идёт очень тяжело, ещё толком не начинал..</p>
+      <p data-i18n="bio.p4">Социофоб. Чаще всего молчу в дискорде, могу иногда что-то сказать. Не люблю шум и всё вот это. Тёмные темы и тишина — комфортная зона.</p>
+      <p data-i18n="bio.p5">Люблю внимание, когда называют ласково, а не «эй блядь», и когда пишут первым.</p>
 
       <div class="discord-card" id="discordCard">
         <div class="discord-avatar-wrap">
@@ -722,8 +725,11 @@
   const i18n = {
     ru: {
       'nav.home': 'главная', 'nav.work': 'работы', 'nav.fav': 'любимое', 'nav.contact': 'контакты',
-      'bio.p1': '17. делаю игры в роблоксе, в основном всякие мелочи для себя.',
-      'bio.p2': 'когда не в роблоксе — читаю или залипаю в дискорде.',
+      'bio.p1': '15y.o, делаю игры в роблоксе. Фембоииии и минимализм.',
+      'bio.p2': 'Билдинг беру за основу. ОЧЕНЬ редко лезу в скрипты, но пока так, очень слабенько.',
+      'bio.p3': 'Пытаюсь разобраться в Блендере. Идёт очень тяжело, ещё толком не начинал..',
+      'bio.p4': 'Социофоб. Чаще всего молчу в дискорде, могу иногда что-то сказать. Не люблю шум и всё вот это. Тёмные темы и тишина — комфортная зона.',
+      'bio.p5': 'Люблю внимание, когда называют ласково, а не «эй блядь», и когда пишут первым.',
       'secret': "да, <span class='flag'>я гей</span>, и что? 🏳️‍🌈",
       'h2.work': 'работы', 'h2.fav': 'любимое', 'h2.contact': 'контакты',
       'fav.music': 'музыка', 'fav.games': 'игры',
@@ -739,8 +745,11 @@
     },
     en: {
       'nav.home': 'home', 'nav.work': 'work', 'nav.fav': 'favorites', 'nav.contact': 'contacts',
-      'bio.p1': '17. I make games on Roblox, mostly small things for myself.',
-      'bio.p2': "when I'm not on Roblox — reading or hanging out on Discord.",
+      'bio.p1': '15y.o, making games on Roblox. Fembooooys and minimalism.',
+      'bio.p2': 'Building is my main thing. VERY rarely touch scripts, and even then — pretty weak.',
+      'bio.p3': "Trying to figure out Blender. It's really rough, haven't even properly started..",
+      'bio.p4': "Sociophobe. Usually silent on Discord, sometimes say something. Don't like noise and all that. Dark themes and silence — comfort zone.",
+      'bio.p5': 'I like attention when people call me softly, not like «hey bitch», and when they message first.',
       'secret': "yes, <span class='flag'>I'm gay</span>, so what? 🏳️‍🌈",
       'h2.work': 'work', 'h2.fav': 'favorites', 'h2.contact': 'contacts',
       'fav.music': 'music', 'fav.games': 'games',
@@ -756,7 +765,24 @@
     }
   };
 
-  let currentLang = safeGet('w1nteer-lang') || 'ru';
+  // ===========================================================
+  // [ЯЗЫК] Автоопределение
+  //
+  // 1. Если пользователь уже выбирал язык вручную (кликал ru/en) —
+  //    всегда используем его выбор.
+  // 2. Иначе смотрим на язык браузера:
+  //    русский и близкие (uk, be, kk, ky, uz, tg, hy, az, ka) → ru,
+  //    все остальные → en.
+  // ===========================================================
+  function detectLang() {
+    const saved = safeGet('w1nteer-lang');
+    if (saved === 'ru' || saved === 'en') return saved;
+
+    const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    return /^(ru|uk|be|kk|ky|uz|tg|hy|az|ka)/.test(browserLang) ? 'ru' : 'en';
+  }
+
+  let currentLang = detectLang();
   let lastDiscordState = null;
 
   function applyLang(lang) {
